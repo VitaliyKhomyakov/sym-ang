@@ -1,0 +1,3 @@
+_products:
+    path:     /products
+    defaults: { _controller: AppProductsBundle:Products:index }

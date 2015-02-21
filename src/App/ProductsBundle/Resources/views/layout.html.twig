@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% block head %}
+        <meta charset="UTF-8" />
+        <meta name="robots" content="noindex,nofollow" />
+        <title>
+        {% block title 'Тестовое приложение' %}
+        </title>
+
+        <script src="//yastatic.net/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+        <link href="{{ asset('bundles/products/css/structure.css') }}" rel="stylesheet" />
+        <link href="{{ asset('bundles/products/css/body.css') }}" rel="stylesheet" />
+        <link href="//yastatic.net/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet" />
+        <link rel="icon" sizes="16x16" href="{{ asset('/favicon.ico') }}" />
+
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular.min.js"></script>
+
+    {% endblock %}
+</head>
+<body>
+    {% block body %}
+        <div id="content">
+            <div class="sf-reset">
+                <div class="block">
+                    {% block content %}
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+    {% endblock %}
+</body>
+</html>
+
+
+

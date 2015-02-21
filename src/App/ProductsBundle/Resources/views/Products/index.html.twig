@@ -1,0 +1,44 @@
+{% extends "AppProductsBundle::layout.html.twig" %}
+
+{% block title "Товары" %}
+
+{% block content_header %}
+{% endblock %}
+
+{% block content %}
+    <div class="header-content">
+        <h1 class="title">Товары</h1>
+    </div>
+    <div class="message-block">
+    </div>
+    <div class="products">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Фото</th>
+                    <th>Заголовок</th>
+                    <th>Описание</th>
+                    <th>Управление</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for product in products %}
+                <tr>
+                    <td class="photo">
+                        <img src="{{ asset('upload/images/' ~ product.getFirstPhoto().getPhoto() ) | imagine_filter('product_photo') }}" />
+                    </td>
+                    <td> {{ product.getTitle() }} </td>
+                    <td> {{ product.getDescription() }} </td>
+                    <td class="control-elem">
+                        <button type="button" class="btn btn-primary btn-sm">Редактировать</button>
+                        <button type="button" class="btn btn-danger  btn-sm">Удалить</button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <div class="add-elem">
+            <button type="button" class="btn btn-success">Добавить</button>
+        </div>
+    </div>
+{% endblock %}

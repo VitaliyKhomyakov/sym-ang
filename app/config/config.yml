@@ -71,3 +71,51 @@ swiftmailer:
     username:  "%mailer_user%"
     password:  "%mailer_password%"
     spool:     { type: memory }
+
+liip_imagine:
+    resolvers:
+       default:
+          web_path: ~
+
+    filter_sets:
+        cache: ~
+        product_photo:
+            quality: 100
+            filters:
+                thumbnail: { size: [150, 150], mode: outbound }
+
+liip_imagine:
+
+    resolvers:
+        default:
+            web_path:
+              web_root: ~
+              cache_prefix: ~
+
+
+    loaders:
+        default:
+            filesystem:
+                data_root: ~
+
+    driver:               gd
+    cache:                default
+    data_loader:          default
+
+    controller:
+        filter_action:         liip_imagine.controller:filterAction
+        filter_runtime_action: liip_imagine.controller:filterRuntimeAction
+
+    filter_sets:
+        name:
+            path:                 ~
+            quality:              100
+            animated:             false
+            format:               ~
+            cache:                ~
+            data_loader:          ~
+            controller:           ~
+            route:                []
+            filters:
+                # Прототип фильтра
+                name:                 []
