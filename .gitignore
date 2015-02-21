@@ -11,6 +11,6 @@
 /bin/
 /composer.phar
 /atlassian-ide-plugin.xml
+/.idea/
 web/upload
 web/media
-/.idea/
