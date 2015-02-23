@@ -24,7 +24,8 @@ framework:
         handler_id:  ~
     fragments:       ~
     http_method_override: true
-
+    serializer:
+        enabled: true
 # Twig Configuration
 twig:
     debug:            "%kernel.debug%"
@@ -117,5 +118,5 @@ liip_imagine:
             controller:           ~
             route:                []
             filters:
-                # Прототип фильтра
                 name:                 []
+

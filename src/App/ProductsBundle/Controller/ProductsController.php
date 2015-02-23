@@ -3,9 +3,6 @@
 namespace App\ProductsBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 class ProductsController extends Controller
@@ -15,8 +12,8 @@ class ProductsController extends Controller
      */
     public function indexAction()
     {
-        $em       = $this->getDoctrine()->getManager();
-        $products = $em->getRepository('AppProductsBundle:Products')->findBy([], null, 10);
+        $em       = $this->getDoctrine()->getEntityManager();
+        $products = $em->getRepository('AppProductsBundle:Products')->findBy([], ['id' => 'desc'], 10);
         $photos   = $em->getRepository('AppProductsBundle:ProductsPhoto');
 
         foreach ($products as $product) {
@@ -26,8 +23,8 @@ class ProductsController extends Controller
                 $product->addPhoto($element);
             }
         }
-
-        return array('products' => $products);
+        $countProduct = count($products);
+        return ['products' => $products, 'countProduct' => $countProduct];
     }
 
 }

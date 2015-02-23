@@ -143,7 +143,12 @@ class Products
      * @return \Doctrine\Common\Collections\Collection
      */
     public function getFirstPhoto() {
-        return (!empty($this->photo[0])) ? $this->photo[0] : false;
+
+        if (empty($this->photo[0])) {
+            $this->photo = 'nofoto.png';
+            return $this;
+        }
+        return $this->photo[0];
     }
 
 }
