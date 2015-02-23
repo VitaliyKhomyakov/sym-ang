@@ -72,3 +72,38 @@ td.photo {
     max-height: 140px;
     max-width: 140px;
 }
+
+.modal-photo {
+    width: 150px;
+    height: 150px;
+}
+
+.product-photo .photo {
+    float: left;
+}
+
+.app-uploader {
+    clear: both;
+}
+
+.upl-btn {
+    padding-left: 15px;
+}
+
+textarea.form-control {
+    resize: none;
+}
+
+.btn-img-remove button {
+    margin-left: 46px;
+    margin-top: 10px;
+}
+
+.product-photo {
+    width: 915px;
+}
+
+.photo {
+    margin-right: 29px;
+    margin-top: 5px;
+}

@@ -1,8 +1,14 @@
 {% extends "AppProductsBundle::layout.html.twig" %}
 
-{% block title "Товары" %}
+{% block title "Products" %}
 
-{% block content_header %}
+{% block head %}
+    {{ parent() }}
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/animatecss/3.2.0/animate.css"/>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.5/angular.min.js"></script>
+    <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.12.1.js"></script>
+    <script src="http://nervgh.github.io/pages/angular-file-upload/angular-file-upload.js"></script>
+    <script src="{{ asset('bundles/products/js/script.js') }}"></script>
 {% endblock %}
 
 {% block content %}
@@ -11,7 +17,7 @@
     </div>
     <div class="message-block">
     </div>
-    <div class="products">
+    <div ng-app="app" ng-controller="Product" class="products">
         <table class="table">
             <thead>
                 <tr>
@@ -30,8 +36,8 @@
                     <td> {{ product.getTitle() }} </td>
                     <td> {{ product.getDescription() }} </td>
                     <td class="control-elem">
-                        <button type="button" class="btn btn-primary btn-sm">Редактировать</button>
-                        <button type="button" class="btn btn-danger  btn-sm">Удалить</button>
+                        <button type="button" class="btn btn-primary btn-sm" ng-click="editProduct({{ product.getId() }}, $event)">Редактировать</button>
+                        <button type="button" class="btn btn-danger  btn-sm" ng-click="editProduct({{ product.getId() }}, $event)">Удалить</button>
                     </td>
                 </tr>
             {% endfor %}
@@ -40,5 +46,6 @@
         <div class="add-elem">
             <button type="button" class="btn btn-success">Добавить</button>
         </div>
+        {% include "AppProductsBundle:Products:modal.html.twig"  %}
     </div>
 {% endblock %}
