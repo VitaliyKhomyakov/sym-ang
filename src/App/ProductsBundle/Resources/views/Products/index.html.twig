@@ -27,25 +27,30 @@
                     <th>Управление</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="tb body">
             {% for product in products %}
-                <tr>
+                <tr class="tr-{{ product.getId() }}">
                     <td class="photo">
                         <img src="{{ asset('upload/images/' ~ product.getFirstPhoto().getPhoto() ) | imagine_filter('product_photo') }}" />
                     </td>
                     <td> {{ product.getTitle() }} </td>
                     <td> {{ product.getDescription() }} </td>
                     <td class="control-elem">
-                        <button type="button" class="btn btn-primary btn-sm" ng-click="editProduct({{ product.getId() }}, $event)">Редактировать</button>
-                        <button type="button" class="btn btn-danger  btn-sm" ng-click="editProduct({{ product.getId() }}, $event)">Удалить</button>
+                        <button type="button" class="btn btn-primary btn-sm" ng-click="editProduct({{ product.getId() }}, $event)">Edit</button>
+                        <button type="button" class="btn btn-danger  btn-sm" ng-click="removeConfirmProduct({{ product.getId() }}, $event)">Remove</button>
                     </td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
         <div class="add-elem">
-            <button type="button" class="btn btn-success">Добавить</button>
+            <button type="button" class="btn btn-success" ng-click="createProduct()">Добавить</button>
         </div>
+        {% if countProduct > 2 %}
+            <div class="more-elem">
+                <button type="button" class="btn btn-default btn-xs" ng-click="getMoreProduct()">Еще</button>
+            </div>
+        {% endif %}
         {% include "AppProductsBundle:Products:modal.html.twig"  %}
     </div>
 {% endblock %}

@@ -7,11 +7,14 @@ use FOS\RestBundle\Controller\FOSRestController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use App\ProductsBundle\Entity\ProductsPhoto;
+use App\ProductsBundle\Entity\Products;
 
 class ServiceController extends FOSRestController {
 
 
     /**
+     * Returns information about the product
+     *
      * @Rest\View
      */
     public function readProductAction($id) {
@@ -45,6 +48,8 @@ class ServiceController extends FOSRestController {
     }
 
     /**
+     * Adds an image to the product
+     *
      * @Rest\View
      */
     public function addPhotoAction(Request $request) {
@@ -87,6 +92,8 @@ class ServiceController extends FOSRestController {
     }
 
     /**
+     * Removes image the product
+     *
      * @Rest\View
      */
     public function removePhotoAction(Request $request) {
@@ -110,4 +117,102 @@ class ServiceController extends FOSRestController {
 
         return new Response(json_encode($response));
     }
+
+    /**
+     * Update information about product
+     *
+     * @Rest\View
+     */
+    public function updateProductAction(Request $request) {
+
+        $product_id  = (int) $request->get('product_id');
+        $title       = $request->get('title');
+        $description = $request->get('description');
+
+        $em         = $this->getDoctrine()->getManager();
+        $product    = $em->getRepository('AppProductsBundle:Products')->find(['id' => $product_id]);
+
+        if (!$product) {
+            $error = ['code' => 'fail'];
+            return new Response(json_encode($error));
+        }
+
+        $product->setTitle($title);
+        $product->setDescription($description);
+
+        $em->persist($product);
+        $em->flush();
+
+        $response = [
+            'code' => 'success'
+        ];
+
+        return new Response(json_encode($response));
+    }
+
+    /**
+     * Adding new product
+     *
+     * @Rest\View
+     */
+    public function addProductAction(Request $request) {
+        $title       = $request->get('title');
+        $description = $request->get('description');
+
+        if ((!trim($title)) || (!trim($description))) {
+            $error = [
+                'code'  => 'fail',
+                'error' => 'empty_fields'
+            ];
+            return new Response(json_encode($error));
+        }
+        $em       = $this->getDoctrine()->getManager();
+        $product  = new Products();
+        $product->setTitle($title);
+        $product->setDescription($description);
+        $em->persist($product);
+        $em->flush();
+
+        $response = [
+            'code'       => 'success',
+            'product_id' => $product->getId(),
+            'photo'      => 'nofoto.png'
+        ];
+
+        return new Response(json_encode($response));
+    }
+
+    /**
+     * Remove product and photos
+     *
+     * @Rest\View
+     */
+    public function removeProductAction(Request $request) {
+
+        $product_id  = (int) $request->get('product_id');
+        $em         = $this->getDoctrine()->getManager();
+        $product    = $em->getRepository('AppProductsBundle:Products')->find(['id' => $product_id]);
+
+        if (!$product) {
+            $error = ['code' => 'fail'];
+            return new Response(json_encode($error));
+        }
+
+        $photoList = $em->getRepository('AppProductsBundle:ProductsPhoto')->findBy(array('product_id' => $product->getId()));
+        foreach ($photoList as $element) {
+            $element->removeUpload();
+            $product->removePhoto($element);
+            $em->remove($element);
+        }
+        $em->remove($product);
+        $em->flush();
+
+        $response = [
+            'code'       => 'success',
+        ];
+
+        return new Response(json_encode($response));
+    }
+
+
 }

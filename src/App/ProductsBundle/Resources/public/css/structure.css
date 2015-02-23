@@ -68,9 +68,9 @@ pre {
     font-family: Arial, Helvetica, sans-serif;
 }
 
-td.photo {
-    max-height: 140px;
-    max-width: 140px;
+td.photo img{
+    max-height: 150px;
+    max-width: 150px;
 }
 
 .modal-photo {
@@ -106,4 +106,16 @@ textarea.form-control {
 .photo {
     margin-right: 29px;
     margin-top: 5px;
+}
+
+.add-elem {
+    text-align: right;
+}
+
+.more-elem {
+    text-align: center;
+}
+
+.more-elem button {
+    width: 200px;
 }

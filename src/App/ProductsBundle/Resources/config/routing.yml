@@ -21,3 +21,21 @@ _service_remove_photo:
     defaults: { _controller: AppProductsBundle:Service:removePhoto, _format: ~ }
     requirements:
         _method: POST
+
+_service_update_product:
+    pattern:  /service/update_product/
+    defaults: { _controller: AppProductsBundle:Service:updateProduct, _format: ~ }
+    requirements:
+        _method: POST
+
+_service_add_product:
+    pattern:  /service/add_product/
+    defaults: { _controller: AppProductsBundle:Service:addProduct, _format: ~ }
+    requirements:
+        _method: POST
+
+_service_remove_product:
+    pattern:  /service/remove_product/
+    defaults: { _controller: AppProductsBundle:Service:removeProduct, _format: ~ }
+    requirements:
+        _method: POST

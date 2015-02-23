@@ -10,6 +10,19 @@
     });
 
     /*
+     * Variables of objects for later recall
+     */
+    var editProduct,
+        removeProduct;
+
+    /*
+     * Wrapper method for AngularJs
+     */
+    function el(selector) {
+        return angular.element(document.querySelector(selector));
+    }
+
+    /*
      * Displays a pop-up window to manage products
      */
     app.controller('Product', function($scope, $modal, $http){
@@ -17,11 +30,11 @@
         /*
          *  AJAX receives data about the product
          */
-        $scope.editProduct = function(item, event) {
+        editProduct = $scope.editProduct = function(item, event) {
             var responsePromise = $http.get("/service/get_product/" + item);
             responsePromise.success(function(data, status, headers, config) {
                 if (data.code === 'success') {
-                    $scope.fromServer = data.title;
+                    data.command = 'edit';
                     var modalInstance = $modal.open({
                         templateUrl: 'ProductModalContent.html',
                         controller: 'ProductEditModal',
@@ -38,6 +51,31 @@
                 alert("AJAX failed!");
             });
         };
+
+        removeProduct = $scope.removeConfirmProduct = function(item, event) {
+            var modalInstance = $modal.open({
+                templateUrl: 'MessageRemoveProductModalContent.html',
+                controller:  'MessageRemoveProductModalContent',
+                resolve: {
+                    items: function () {
+                        return { id :item };
+                    }
+                }
+            });
+        };
+
+        $scope.createProduct = function(item, event) {
+            var modalInstance = $modal.open({
+                templateUrl: 'ProductModalContent.html',
+                controller: 'ProductEditModal',
+                size: 'lg',
+                resolve: {
+                    items: function () {
+                        return { command : 'create'};
+                    }
+                }
+            });
+        };
     });
 
     /*
@@ -49,6 +87,7 @@
                 id     : $scope.this.photo.id,
                 photos : $scope.product.photos
             };
+
             var modalInstance = $modal.open({
                 templateUrl: 'MessageRemovePhotoModalContent.html',
                 controller:  'MessageRemovePhotoModalContent',
@@ -64,16 +103,70 @@
     /*
      * Opens a window for editing product and loading images
      */
-    app.controller('ProductEditModal', function ($scope, $modalInstance, items) {
+    app.controller('ProductEditModal', function ($scope, $modalInstance, items, $http, $modal, $compile) {
         $scope.items = items;
         $scope.product = {};
-        $scope.product.title       = items.title;
+        $scope.product.title = items.title;
         $scope.product.description = items.description;
-        $scope.product.photos      = items.photo;
-        $scope.product.id          = items.id;
-        $scope.ok = function () {
-            $modalInstance.close();
+        $scope.product.photos = items.photo;
+        $scope.product.id = items.id;
+        $scope.save = function () {
+
+            var formData = {
+                product_id: $scope.product.id,
+                title: el('#exampleInputTitle').val(),
+                description: el('#exampleInputDescription').val()
+            };
+
+            switch (items.command) {
+
+                case 'edit':
+                    $http.post('/service/update_product/', formData).
+                    success(function (data, status, headers, config) {
+                        var code;
+                        if (data.code === 'success') {
+                            code = 'update';
+                        } else {
+                            code = 'fail'
+                        }
+                        var modalInstance = $modal.open({
+                            templateUrl: 'MessagePhotoModal.html',
+                            controller: 'MessagePhotoModal'
+                        });
+                        modalInstance.code = code;
+                    }).
+                    error(function (data, status, headers, config) {
+                        alert("AJAX failed!");
+                    });
+                    break;
+
+                case 'create':
+                    $http.post('/service/add_product/', formData).
+                    success(function (data, status, headers, config) {
+                        if (data.code === 'success') {
+                            var template = '<tr class="tr-' + data.product_id +' "><td class="photo">' +
+                                '<img src="upload/images/'+ data.photo +'" /></td><td>' + formData.title + '</td><td> ' + formData.description + ' </td>' +
+                                '<td class="control-elem">' +
+                                '<button type="button" class="btn btn-primary btn-sm l-edit" ng-click="editProduct('+ data.product_id +', $event)">Edit</button>' +
+                                '<button type="button" class="btn btn-danger  btn-sm l-remove" ng-click="removeProduct(' + data.product_id + ', $event)">Remove</button>' +
+                                '</td></tr>';
+
+                            el('.tb.body').prepend(template);
+                            el('.l-edit').off('click').on("click", function() {
+                                editProduct(data.product_id, {});
+                            });
+                            el('.l-remove').off('click').on("click", function() {
+                                editProduct(data.product_id, {});
+                            });
+                            $modalInstance.dismiss('cancel');
+                        }
+                    })
+                    .error(function (data, status, headers, config) {
+                        alert("AJAX failed!");
+                    });
+            }
         };
+
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
         };
@@ -83,7 +176,7 @@
      * AJAX request to remove photos
      */
     app.controller('MessageRemovePhotoModalContent', function ($scope, $modalInstance, items, $http) {
-        $scope.RemoveImg = function () {
+        $scope.removeImg = function () {
             $http.post('/service/remove_photo/', {photo_id : items.id}).
                 success(function(data, status, headers, config) {
                     if (data.code === 'success') {
@@ -95,6 +188,34 @@
                         }
                         items.photos.splice(index, 1);
                         $modalInstance.close();
+                    }
+                }).
+                error(function(data, status, headers, config) {
+                    alert("AJAX failed!");
+                });
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
+    });
+
+    /*
+     * AJAX request to remove photos
+     */
+    app.controller('MessageRemoveProductModalContent', function ($scope, $modalInstance, items, $http) {
+        $scope.removeProduct = function () {
+
+            $http.post('/service/remove_product/', {product_id : items.id}).
+                success(function(data, status, headers, config) {
+                    if (data.code === 'success') {
+                        el('.tr-' + items.id).remove();
+                        $modalInstance.dismiss('cancel');
+                    } else if (data.code === 'fail'){
+                        $modal.open({
+                            templateUrl: 'MessagePhotoModal.html',
+                            controller:  'MessagePhotoModal'
+                        });
                     }
                 }).
                 error(function(data, status, headers, config) {
@@ -182,14 +303,22 @@
             case 'type':
                 $scope.modal.title   = 'Loading photo';
                 $scope.modal.message = 'Incorrect file type (are permissible jpg/jpeg/png/gif/bmp)';
+                $scope.modal.class   = 'bg-danger';
                 break;
             case 'size':
                 $scope.modal.title   = 'Loading photo';
                 $scope.modal.message = 'The download file size is too great (1 MB)';
+                $scope.modal.class   = 'bg-danger';
+                break;
+            case 'update':
+                $scope.modal.title   = 'Update product';
+                $scope.modal.message = 'This product successfully updated';
+                $scope.modal.class   = 'bg-success';
                 break;
             default :
                 $scope.modal.title   = 'Unknown error';
                 $scope.modal.message = 'An unknown error occurred, try again later';
+                $scope.modal.class   = 'bg-danger';
         }
 
         $scope.cancel = function () {
