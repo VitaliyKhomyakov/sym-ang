@@ -13,7 +13,8 @@
      * Variables of objects for later recall
      */
     var editProduct,
-        removeProduct;
+        removeProduct,
+        reviewProduct;
 
     /*
      * Number of products to be echoed on request
@@ -71,6 +72,30 @@
         };
 
         /*
+         * Displays a window of review product
+         */
+        reviewProduct = $scope.reviewProduct = function(item, event) {
+            var responsePromise = $http.get("/service/get_product/" + item);
+            responsePromise.success(function(data, status, headers, config) {
+                if (data.code === 'success') {
+                    var modalInstance = $modal.open({
+                        templateUrl: 'ReviewProductModalContent.html',
+                        controller: 'ReviewProductModalContent',
+                        size: 'lg',
+                        resolve: {
+                            items: function () {
+                                return data;
+                            }
+                        }
+                    });
+                }
+            });
+            responsePromise.error(function(data, status, headers, config) {
+                alert("AJAX failed!");
+            });
+        };
+
+        /*
          * Displays a window of removal product
          */
         removeProduct = $scope.removeConfirmProduct = function(item, event) {
@@ -113,7 +138,7 @@
                             $scope.moreElem = true;
                         }
                         for (product in data.products) {
-                            addElements(data.products[product]);
+                            addElements(data.products[product], 'append');
                         }
                     }
                 })
@@ -143,6 +168,22 @@
                 }
             });
         }
+    });
+
+    /*
+     * Opens a window for review product and images
+     */
+    app.controller('ReviewProductModalContent', function ($scope, $modalInstance, items) {
+        $scope.items = items;
+        $scope.product = {};
+        $scope.product.title = items.title;
+        $scope.product.description = items.description;
+        $scope.product.photos = items.photo;
+        $scope.product.id = items.id;
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
     });
 
     /*
@@ -182,6 +223,7 @@
                         var code;
                         if (data.code === 'success') {
                             code = 'update';
+                            el('.tr-' + items.id + ' .sp-title').text(formData.title);
                         } else {
                             code = 'fail'
                         }
@@ -200,21 +242,9 @@
                     $http.post('/service/add_product/', formData).
                     success(function (data, status, headers, config) {
                         if (data.code === 'success') {
-                            var template = '<tr class="tr-' + data.product_id +' "><td class="photo">' +
-                                '<img src="upload/images/'+ data.photo +'" /></td><td>' + formData.title + '</td><td> ' + formData.description + ' </td>' +
-                                '<td class="control-elem">' +
-                                '<button type="button" class="btn btn-primary btn-sm l-edit" ng-click="editProduct('+ data.product_id +', $event)">Edit</button>' +
-                                '<button type="button" class="btn btn-danger  btn-sm l-remove" ng-click="removeProduct(' + data.product_id + ', $event)">Remove</button>' +
-                                '</td></tr>';
-
-                            el('.tb.body').prepend(template);
-                            el('.l-edit').off('click').on("click", function() {
-                                editProduct(data.product_id, {});
-                            });
-                            el('.l-remove').off('click').on("click", function() {
-                                editProduct(data.product_id, {});
-                            });
-                            offset.setOffest(offset.getOffest() + 1);
+                            data.title          = formData.title;
+                            data.photo[0].photo = data.photo;
+                            addElements(data, 'prepend');
                             $modalInstance.dismiss('cancel');
                         }
                     })
@@ -417,7 +447,7 @@
      * Checking the of fields on emptiness and the number of symbols
      */
     function validate(formData) {
-        var code = ''
+        var code = '';
         if (formData.title.trim() === '') {
             return code = 'empty_title';
         }
@@ -439,20 +469,30 @@
         return code;
     }
 
-    function addElements(data) {
+    function addElements(data, typeInsert) {
+        var photo = (data.photo[0].photo == undefined) ? data.photo : data.photo[0].photo;
         var template = '<tr class="tr-' + data.product_id +' "><td class="photo">' +
-            '<img src="upload/images/'+ data.photo[0].photo +'" /></td><td>' + data.title + '</td><td> ' + data.description + ' </td>' +
+            '<img src="upload/images/'+ photo +'" /></td><td>' + data.title + '</td>' +
             '<td class="control-elem">' +
+            '<button type="button" class="btn btn-info btn-sm l-rewiew" ng-click="reviewProduct('+ data.product_id +', $event)">Review</button>' +
             '<button type="button" class="btn btn-primary btn-sm l-edit" ng-click="editProduct('+ data.product_id +', $event)">Edit</button>' +
             '<button type="button" class="btn btn-danger  btn-sm l-remove" ng-click="removeProduct(' + data.product_id + ', $event)">Remove</button>' +
             '</td></tr>';
 
-        el('.tb.body').append(template);
+        if(typeInsert === 'append') {
+            el('.tb.body').append(template);
+        } else {
+            el('.tb.body').prepend(template);
+        }
+
         el('.l-edit').off('click').on("click", function() {
             editProduct(data.product_id, {});
         });
         el('.l-remove').off('click').on("click", function() {
-            editProduct(data.product_id, {});
+            removeProduct(data.product_id, {});
+        });
+        el('.l-rewiew').off('click').on("click", function() {
+            reviewProduct(data.product_id, {});
         });
         offset.setOffest(offset.getOffest() + 1);
     }
