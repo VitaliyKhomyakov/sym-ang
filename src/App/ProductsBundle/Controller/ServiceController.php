@@ -286,12 +286,20 @@ class ServiceController extends FOSRestController {
         }
 
         if ($name === 'title') {
-            $strLen = Products::STR_LEM_TITLE;
+            $strMinLen = Products::STR_LEM_MIN_TITLE;
+            $strMaxLen = Products::STR_LEM_MAX_TITLE;
         } elseif ($name === 'description') {
-            $strLen = Products::STR_LEN_DESCRIPTION;
+            $strMinLen = Products::STR_LEN_MIN_DESCRIPTION;
+            $strMaxLen = Products::STR_LEN_MAX_DESCRIPTION;
         }
 
-        return (strlen($field) < $strLen) ? ['code' => 'min_' . $name] : false;
+        if (strlen($field) < $strMinLen) {
+            return ['code' => 'min_' . $name];
+        } elseif (strlen($field) > $strMaxLen) {
+            return ['code' => 'max_' . $name];
+        }
+
+        return false;
 
     }
 }

@@ -28,6 +28,11 @@
         }
     };
 
+    var maxTitle       = 30,
+        minTitle       = 3,
+        maxDescription = 250,
+        minDescription = 30;
+
     /*
      * Wrapper method for AngularJs
      */
@@ -369,7 +374,12 @@
                 break;
             case 'min_title':
                 $scope.modal.title   = 'Length of a title';
-                $scope.modal.message = 'The minimum length of a title';
+                $scope.modal.message = 'The minimum length of a title (' + minTitle + ')';
+                $scope.modal.class   = 'bg-danger';
+                break;
+            case 'max_title':
+                $scope.modal.title   = 'Length of a title';
+                $scope.modal.message = 'The maximum length of a title (' + maxTitle + ')';
                 $scope.modal.class   = 'bg-danger';
                 break;
             case 'empty_description':
@@ -379,7 +389,12 @@
                 break;
             case 'min_description':
                 $scope.modal.title   = 'Length of a description';
-                $scope.modal.message = 'The minimum length of a description';
+                $scope.modal.message = 'The minimum length of a description (' + minDescription + ')';
+                $scope.modal.class   = 'bg-danger';
+                break;
+            case 'max_description':
+                $scope.modal.title   = 'Length of a description';
+                $scope.modal.message = 'The maximum length of a description (' + maxDescription + ')';
                 $scope.modal.class   = 'bg-danger';
                 break;
             case 'update':
@@ -409,11 +424,17 @@
         if (formData.description.trim() === '') {
             return code = 'empty_description';
         }
-        if (formData.title.trim().length < 3) {
+        if (formData.title.trim().length < minTitle) {
             return code = 'min_title';
         }
-        if (formData.description.trim().length < 30) {
+        if (formData.description.trim().length < minDescription) {
             return code = 'min_description';
+        }
+        if (formData.title.trim().length > maxTitle) {
+            return code = 'max_title';
+        }
+        if (formData.description.trim().length > maxDescription) {
+            return code = 'max_description';
         }
         return code;
     }
