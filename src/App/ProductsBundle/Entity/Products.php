@@ -6,10 +6,18 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  *
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\ProductsBundle\Repository\ProductsRepository")
  */
 class Products
 {
+
+    /*
+     * Length of fields
+     */
+    const STR_LEM_MIN_TITLE       = 3;
+    const STR_LEM_MAX_TITLE       = 30;
+    const STR_LEN_MIN_DESCRIPTION = 30;
+    const STR_LEN_MAX_DESCRIPTION = 250;
 
     /**
      * @var integer $id

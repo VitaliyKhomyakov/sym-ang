@@ -16,6 +16,24 @@
         removeProduct;
 
     /*
+     * Number of products to be echoed on request
+     */
+    var offset = {
+        offset : 5,
+        setOffest : function(offset) {
+            this.offset = offset;
+        },
+        getOffest : function() {
+            return this.offset;
+        }
+    };
+
+    var maxTitle       = 30,
+        minTitle       = 3,
+        maxDescription = 250,
+        minDescription = 30;
+
+    /*
      * Wrapper method for AngularJs
      */
     function el(selector) {
@@ -52,6 +70,9 @@
             });
         };
 
+        /*
+         * Displays a window of removal product
+         */
         removeProduct = $scope.removeConfirmProduct = function(item, event) {
             var modalInstance = $modal.open({
                 templateUrl: 'MessageRemoveProductModalContent.html',
@@ -64,6 +85,9 @@
             });
         };
 
+        /*
+         * Displays a window creation of goods
+         */
         $scope.createProduct = function(item, event) {
             var modalInstance = $modal.open({
                 templateUrl: 'ProductModalContent.html',
@@ -74,6 +98,27 @@
                         return { command : 'create'};
                     }
                 }
+            });
+        };
+
+        /*
+         * Receives goods from database
+         */
+        $scope.getMoreProduct = function(item, event) {
+            $http.get("/service/more_product/" + offset.getOffest())
+                .success(function(data, status, headers, config) {
+                    if (data.code === 'success') {
+                        var template = '';
+                        if (data.products.length < offset.getOffest()) {
+                            $scope.moreElem = true;
+                        }
+                        for (product in data.products) {
+                            addElements(data.products[product]);
+                        }
+                    }
+                })
+                .error(function(data, status, headers, config) {
+                alert("AJAX failed!");
             });
         };
     });
@@ -118,6 +163,17 @@
                 description: el('#exampleInputDescription').val()
             };
 
+            var code = validate(formData);
+
+            if (code !== '') {
+                var modalInstance = $modal.open({
+                    templateUrl: 'MessagePhotoModal.html',
+                    controller: 'MessagePhotoModal'
+                });
+                modalInstance.code = code;
+                return;
+            }
+
             switch (items.command) {
 
                 case 'edit':
@@ -158,6 +214,7 @@
                             el('.l-remove').off('click').on("click", function() {
                                 editProduct(data.product_id, {});
                             });
+                            offset.setOffest(offset.getOffest() + 1);
                             $modalInstance.dismiss('cancel');
                         }
                     })
@@ -310,6 +367,36 @@
                 $scope.modal.message = 'The download file size is too great (1 MB)';
                 $scope.modal.class   = 'bg-danger';
                 break;
+            case 'empty_title':
+                $scope.modal.title   = 'Empty Title';
+                $scope.modal.message = 'You must specify the title';
+                $scope.modal.class   = 'bg-danger';
+                break;
+            case 'min_title':
+                $scope.modal.title   = 'Length of a title';
+                $scope.modal.message = 'The minimum length of a title (' + minTitle + ')';
+                $scope.modal.class   = 'bg-danger';
+                break;
+            case 'max_title':
+                $scope.modal.title   = 'Length of a title';
+                $scope.modal.message = 'The maximum length of a title (' + maxTitle + ')';
+                $scope.modal.class   = 'bg-danger';
+                break;
+            case 'empty_description':
+                $scope.modal.title   = 'Empty Description';
+                $scope.modal.message = 'You must specify the description';
+                $scope.modal.class   = 'bg-danger';
+                break;
+            case 'min_description':
+                $scope.modal.title   = 'Length of a description';
+                $scope.modal.message = 'The minimum length of a description (' + minDescription + ')';
+                $scope.modal.class   = 'bg-danger';
+                break;
+            case 'max_description':
+                $scope.modal.title   = 'Length of a description';
+                $scope.modal.message = 'The maximum length of a description (' + maxDescription + ')';
+                $scope.modal.class   = 'bg-danger';
+                break;
             case 'update':
                 $scope.modal.title   = 'Update product';
                 $scope.modal.message = 'This product successfully updated';
@@ -325,5 +412,49 @@
             $modalInstance.dismiss('cancel');
         };
     });
+
+    /*
+     * Checking the of fields on emptiness and the number of symbols
+     */
+    function validate(formData) {
+        var code = ''
+        if (formData.title.trim() === '') {
+            return code = 'empty_title';
+        }
+        if (formData.description.trim() === '') {
+            return code = 'empty_description';
+        }
+        if (formData.title.trim().length < minTitle) {
+            return code = 'min_title';
+        }
+        if (formData.description.trim().length < minDescription) {
+            return code = 'min_description';
+        }
+        if (formData.title.trim().length > maxTitle) {
+            return code = 'max_title';
+        }
+        if (formData.description.trim().length > maxDescription) {
+            return code = 'max_description';
+        }
+        return code;
+    }
+
+    function addElements(data) {
+        var template = '<tr class="tr-' + data.product_id +' "><td class="photo">' +
+            '<img src="upload/images/'+ data.photo[0].photo +'" /></td><td>' + data.title + '</td><td> ' + data.description + ' </td>' +
+            '<td class="control-elem">' +
+            '<button type="button" class="btn btn-primary btn-sm l-edit" ng-click="editProduct('+ data.product_id +', $event)">Edit</button>' +
+            '<button type="button" class="btn btn-danger  btn-sm l-remove" ng-click="removeProduct(' + data.product_id + ', $event)">Remove</button>' +
+            '</td></tr>';
+
+        el('.tb.body').append(template);
+        el('.l-edit').off('click').on("click", function() {
+            editProduct(data.product_id, {});
+        });
+        el('.l-remove').off('click').on("click", function() {
+            editProduct(data.product_id, {});
+        });
+        offset.setOffest(offset.getOffest() + 1);
+    }
 
 })(window.angular);

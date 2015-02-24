@@ -39,3 +39,10 @@ _service_remove_product:
     defaults: { _controller: AppProductsBundle:Service:removeProduct, _format: ~ }
     requirements:
         _method: POST
+
+_service_more_product:
+    pattern:  /service/more_product/{offset}
+    defaults: { _controller: AppProductsBundle:Service:getMoreProducts, _format: ~ }
+    requirements:
+        _method: GET
+        offset: "\d+"
