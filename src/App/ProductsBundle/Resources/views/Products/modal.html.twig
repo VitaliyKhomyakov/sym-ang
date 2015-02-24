@@ -29,6 +29,33 @@
             <button class="btn btn-primary" ng-click="cancel()">Cancel</button>
         </div>
     </script>
+    <script type="text/ng-template" id="ReviewProductModalContent.html">
+        <div class="modal-header">
+            <h3 class="modal-title">{[{product.title}]}</h3>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="exampleInputTitle">Title</label>
+                <div class="review-title">{[{ product.title }]}</div>
+            </div>
+            <div class="form-group">
+                <label for="exampleInputDescription">Description</label>
+                <div class="review-descr">{[{ product.description }]}</div>
+            </div>
+            <div class="product-photo">
+                <div class="photo" ng-repeat="photo in product.photos">
+                    <div>
+                        <img class="modal-photo img-rounded" ng-src="{{ asset('upload/images/{[{photo.photo}]}') }}"  />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="app-uploader">
+            </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="cancel()">Cancel</button>
+        </div>
+    </script>
     <script type="text/ng-template" id="MessageRemovePhotoModalContent.html">
         <div class="modal-header">
             <h3 class="modal-title">Deleting a photo</h3>

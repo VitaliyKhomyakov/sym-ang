@@ -293,9 +293,9 @@ class ServiceController extends FOSRestController {
             $strMaxLen = Products::STR_LEN_MAX_DESCRIPTION;
         }
 
-        if (strlen($field) < $strMinLen) {
+        if (mb_strlen($field, 'UTF-8') < $strMinLen) {
             return ['code' => 'min_' . $name];
-        } elseif (strlen($field) > $strMaxLen) {
+        } elseif (mb_strlen($field, 'UTF-8') > $strMaxLen) {
             return ['code' => 'max_' . $name];
         }
 

@@ -119,3 +119,21 @@ textarea.form-control {
 .more-elem button {
     width: 200px;
 }
+
+td.photo {
+    width: 300px;
+}
+
+.td-title {
+    width: 370px;
+}
+
+.modal-footer {
+    margin-top: 5px;
+}
+
+.control-elem button {
+    display: block;
+    width: 100px;
+    margin: 5px;
+}

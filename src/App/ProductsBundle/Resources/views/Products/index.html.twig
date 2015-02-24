@@ -18,39 +18,44 @@
     <div class="message-block">
     </div>
     <div ng-app="app" ng-controller="Product" class="products">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Photo</th>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Control buttons</th>
-                </tr>
-            </thead>
-            <tbody class="tb body">
-            {% for product in products %}
-                <tr class="tr-{{ product.getId() }}">
-                    <td class="photo">
-                        <img src="{{ asset('upload/images/' ~ product.getFirstPhoto().getPhoto() ) | imagine_filter('product_photo') }}" />
-                    </td>
-                    <td> {{ product.getTitle() }} </td>
-                    <td> {{ product.getDescription() }} </td>
-                    <td class="control-elem">
-                        <button type="button" class="btn btn-primary btn-sm" ng-click="editProduct({{ product.getId() }}, $event)">Edit</button>
-                        <button type="button" class="btn btn-danger  btn-sm" ng-click="removeConfirmProduct({{ product.getId() }}, $event)">Remove</button>
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-        <div class="add-elem">
-            <button type="button" class="btn btn-success" ng-click="createProduct()">Create</button>
-        </div>
-        {% if countProduct > 2 %}
-            <div ng-hide="moreElem" class="more-elem">
-                <button type="button" class="btn btn-default btn-xs" ng-click="getMoreProduct()">More</button>
+        {% if products %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Photo</th>
+                        <th>Title</th>
+                        <th>Control buttons</th>
+                    </tr>
+                </thead>
+                <tbody class="tb body">
+                {% for product in products %}
+                    <tr class="tr-{{ product.getId() }}">
+                        <td class="photo">
+                            <img src="{{ asset('upload/images/' ~ product.getFirstPhoto().getPhoto() ) | imagine_filter('product_photo') }}" />
+                        </td>
+                        <td class="td-title"> <span class="sp-title">{{ product.getTitle() }}</span> </td>
+                        <td class="control-elem">
+                            <button type="button" class="btn btn-info btn-sm" ng-click="reviewProduct({{ product.getId() }}, $event)">Review</button>
+                            <button type="button" class="btn btn-primary btn-sm" ng-click="editProduct({{ product.getId() }}, $event)">Edit</button>
+                            <button type="button" class="btn btn-danger  btn-sm" ng-click="removeConfirmProduct({{ product.getId() }}, $event)">Remove</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div class="add-elem">
+                <button type="button" class="btn btn-success" ng-click="createProduct()">Create</button>
+            </div>
+            {% if countProduct > 2 %}
+                <div ng-hide="moreElem" class="more-elem">
+                    <button type="button" class="btn btn-default btn-xs" ng-click="getMoreProduct()">More</button>
+                </div>
+            {% endif %}
+            {% include "AppProductsBundle:Products:modal.html.twig"  %}
+        {% else %}
+            <div class="no-product">
+                <h2>Products were not been added</h2>
             </div>
         {% endif %}
-        {% include "AppProductsBundle:Products:modal.html.twig"  %}
     </div>
 {% endblock %}
