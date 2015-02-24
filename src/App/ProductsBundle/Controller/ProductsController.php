@@ -7,24 +7,27 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 class ProductsController extends Controller
 {
+    const PRODUCTS_LIMIT = 5;
+
     /**
      * @Template()
      */
     public function indexAction()
     {
-        $em       = $this->getDoctrine()->getEntityManager();
-        $products = $em->getRepository('AppProductsBundle:Products')->findBy([], ['id' => 'desc'], 10);
+        $em       = $this->getDoctrine()->getManager();
+        $products = $em->getRepository('AppProductsBundle:Products');
         $photos   = $em->getRepository('AppProductsBundle:ProductsPhoto');
 
-        foreach ($products as $product) {
+        $countProduct = $products->getQuantityProducts();
+        $productsList = $products->findBy([], ['id' => 'desc'], self::PRODUCTS_LIMIT);
+        foreach ($productsList as $product) {
             $photoList = $photos->findBy(array('product_id' => $product->getId()));
-
             foreach ($photoList as $element) {
                 $product->addPhoto($element);
             }
         }
-        $countProduct = count($products);
-        return ['products' => $products, 'countProduct' => $countProduct];
+
+        return ['products' => $productsList, 'countProduct' => $countProduct];
     }
 
 }

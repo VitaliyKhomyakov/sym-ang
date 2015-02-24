@@ -6,11 +6,11 @@
         <div class="modal-body">
             <div class="form-group">
                 <label for="exampleInputTitle">Title</label>
-                <input type="text" class="form-control" id="exampleInputTitle" placeholder="Enter title" value="{[{ product.title }]}" />
+                <input maxlength="30" type="text" class="form-control" id="exampleInputTitle" placeholder="Enter title" value="{[{ product.title }]}" />
             </div>
             <div class="form-group">
                 <label for="exampleInputDescription">Description</label>
-                <textarea class="form-control" id="exampleInputDescription" rows="3" >{[{ product.description }]}</textarea>
+                <textarea maxlength="250" class="form-control" id="exampleInputDescription" rows="3" >{[{ product.description }]}</textarea>
             </div>
             <div class="product-photo">
                 <div class="photo" ng-repeat="photo in product.photos">

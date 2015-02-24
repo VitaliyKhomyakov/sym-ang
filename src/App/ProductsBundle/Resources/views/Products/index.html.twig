@@ -13,7 +13,7 @@
 
 {% block content %}
     <div class="header-content">
-        <h1 class="title">Товары</h1>
+        <h1 class="title">Products</h1>
     </div>
     <div class="message-block">
     </div>
@@ -21,10 +21,10 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Фото</th>
-                    <th>Заголовок</th>
-                    <th>Описание</th>
-                    <th>Управление</th>
+                    <th>Photo</th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Control buttons</th>
                 </tr>
             </thead>
             <tbody class="tb body">
@@ -44,11 +44,11 @@
             </tbody>
         </table>
         <div class="add-elem">
-            <button type="button" class="btn btn-success" ng-click="createProduct()">Добавить</button>
+            <button type="button" class="btn btn-success" ng-click="createProduct()">Create</button>
         </div>
         {% if countProduct > 2 %}
-            <div class="more-elem">
-                <button type="button" class="btn btn-default btn-xs" ng-click="getMoreProduct()">Еще</button>
+            <div ng-hide="moreElem" class="more-elem">
+                <button type="button" class="btn btn-default btn-xs" ng-click="getMoreProduct()">More</button>
             </div>
         {% endif %}
         {% include "AppProductsBundle:Products:modal.html.twig"  %}

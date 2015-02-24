@@ -11,10 +11,15 @@ use App\ProductsBundle\Entity\Products;
 
 class ServiceController extends FOSRestController {
 
+    /*
+     * Number of products to be echoed on request
+     */
+    const PRODUCTS_LIMIT = 5;
 
     /**
      * Returns information about the product
      *
+     * @param int $id - product ID
      * @Rest\View
      */
     public function readProductAction($id) {
@@ -28,7 +33,7 @@ class ServiceController extends FOSRestController {
         }
 
         $photos    = $em->getRepository('AppProductsBundle:ProductsPhoto');
-        $photoList = $photos->findBy(array('product_id' => $product->getId()));
+        $photoList = $photos->findBy(['product_id' => $product->getId()]);
         $photo     = [];
         foreach ($photoList as $element) {
             $tmp          =& $photo[];
@@ -42,6 +47,42 @@ class ServiceController extends FOSRestController {
             'title' => $product->getTitle(),
             'description' => $product->getDescription(),
             'photo'       => $photo
+        ];
+
+        return new Response(json_encode($response));
+    }
+
+    /**
+     * Displays the more products per page
+     *
+     * @Rest\View
+     */
+    public function getMoreProductsAction($offset) {
+        $em       = $this->getDoctrine()->getManager();
+        $products = $em->getRepository('AppProductsBundle:Products')->findBy([], ['id' => 'desc'], self::PRODUCTS_LIMIT, (int)$offset);
+        $photos   = $em->getRepository('AppProductsBundle:ProductsPhoto');
+
+        $responseProducts = [];
+
+        foreach ($products as $product) {
+            $tmp =& $responseProducts[];
+            $tmp['product_id']   = $product->getId();
+            $tmp['title']        = $product->getTitle();
+            $tmp['description']  = $product->getDescription();
+            $tmp['photo']        = [];
+
+            $photoList = $photos->findBy(array('product_id' => $product->getId()));
+            foreach ($photoList as $element) {
+                $product->addPhoto($element);
+                $photoTmp          =& $tmp['photo'][];
+                $photoTmp['id']    = $element->getId();
+                $photoTmp['photo'] = $element->getPhoto();
+            }
+        }
+
+        $response = [
+            'code'         => 'success',
+            'products'     => $responseProducts,
         ];
 
         return new Response(json_encode($response));
@@ -129,6 +170,17 @@ class ServiceController extends FOSRestController {
         $title       = $request->get('title');
         $description = $request->get('description');
 
+        $validateFields = [
+            'title'         => $title,
+            'description'   => $description
+        ];
+
+        foreach ($validateFields as $key => $fields) {
+            if ($response = $this->validate($fields, $key)) {
+                return new Response(json_encode($response));
+            }
+        }
+
         $em         = $this->getDoctrine()->getManager();
         $product    = $em->getRepository('AppProductsBundle:Products')->find(['id' => $product_id]);
 
@@ -159,13 +211,17 @@ class ServiceController extends FOSRestController {
         $title       = $request->get('title');
         $description = $request->get('description');
 
-        if ((!trim($title)) || (!trim($description))) {
-            $error = [
-                'code'  => 'fail',
-                'error' => 'empty_fields'
-            ];
-            return new Response(json_encode($error));
+        $validateFields = [
+            'title'         => $title,
+            'description'   => $description
+        ];
+
+        foreach ($validateFields as $key => $fields) {
+            if ($response = $this->validate($fields, $key)) {
+                return new Response(json_encode($response));
+            }
         }
+
         $em       = $this->getDoctrine()->getManager();
         $product  = new Products();
         $product->setTitle($title);
@@ -198,7 +254,7 @@ class ServiceController extends FOSRestController {
             return new Response(json_encode($error));
         }
 
-        $photoList = $em->getRepository('AppProductsBundle:ProductsPhoto')->findBy(array('product_id' => $product->getId()));
+        $photoList = $em->getRepository('AppProductsBundle:ProductsPhoto')->findBy(['product_id' => $product->getId()]);
         foreach ($photoList as $element) {
             $element->removeUpload();
             $product->removePhoto($element);
@@ -215,4 +271,27 @@ class ServiceController extends FOSRestController {
     }
 
 
+    /*
+     * Checking the of fields on emptiness and the number of symbols
+     *
+     * @param string $field - field value
+     * @para, string $name  - type field
+     * @return mixed - returns an array of with the error or FALSE
+     */
+    private function validate($field, $name) {
+        $field = trim($field);
+
+        if (!$field) {
+            return ['code' => 'empty_' . $name];
+        }
+
+        if ($name === 'title') {
+            $strLen = Products::STR_LEM_TITLE;
+        } elseif ($name === 'description') {
+            $strLen = Products::STR_LEN_DESCRIPTION;
+        }
+
+        return (strlen($field) < $strLen) ? ['code' => 'min_' . $name] : false;
+
+    }
 }
