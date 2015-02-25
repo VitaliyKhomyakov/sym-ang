@@ -27,7 +27,7 @@ class ProductsController extends Controller
             }
         }
 
-        return ['products' => $productsList, 'countProduct' => $countProduct];
+        return ['products' => $productsList, 'countProduct' => $countProduct, 'limit' => self::PRODUCTS_LIMIT];
     }
 
 }

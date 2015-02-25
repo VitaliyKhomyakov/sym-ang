@@ -35,7 +35,7 @@ class ProductsPhoto
     /**
      * @var string $photo
      *
-     * @ORM\Column(name="photo", type="string", length=50)
+     * @ORM\Column(name="photo", type="string", length=150)
      */
     private $photo;
 

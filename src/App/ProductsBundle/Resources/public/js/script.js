@@ -472,7 +472,7 @@
     function addElements(data, typeInsert) {
         var photo = (data.photo[0].photo == undefined) ? data.photo : data.photo[0].photo;
         var template = '<tr class="tr-' + data.product_id +' "><td class="photo">' +
-            '<img src="upload/images/'+ photo +'" /></td><td>' + data.title + '</td>' +
+            '<img src="upload/images/'+ photo +'" /></td><td class="td-title"><span class="sp-title">' + data.title + '</span></td>' +
             '<td class="control-elem">' +
             '<button type="button" class="btn btn-info btn-sm l-rewiew" ng-click="reviewProduct('+ data.product_id +', $event)">Review</button>' +
             '<button type="button" class="btn btn-primary btn-sm l-edit" ng-click="editProduct('+ data.product_id +', $event)">Edit</button>' +
