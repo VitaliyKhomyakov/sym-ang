@@ -143,8 +143,8 @@
                     }
                 })
                 .error(function(data, status, headers, config) {
-                alert("AJAX failed!");
-            });
+                    alert("AJAX failed!");
+                });
         };
     });
 
@@ -219,38 +219,38 @@
 
                 case 'edit':
                     $http.post('/service/update_product/', formData).
-                    success(function (data, status, headers, config) {
-                        var code;
-                        if (data.code === 'success') {
-                            code = 'update';
-                            el('.tr-' + items.id + ' .sp-title').text(formData.title);
-                        } else {
-                            code = 'fail'
-                        }
-                        var modalInstance = $modal.open({
-                            templateUrl: 'MessagePhotoModal.html',
-                            controller: 'MessagePhotoModal'
+                        success(function (data, status, headers, config) {
+                            var code;
+                            if (data.code === 'success') {
+                                code = 'update';
+                                el('.tr-' + items.id + ' .sp-title').text(formData.title);
+                            } else {
+                                code = 'fail'
+                            }
+                            var modalInstance = $modal.open({
+                                templateUrl: 'MessagePhotoModal.html',
+                                controller: 'MessagePhotoModal'
+                            });
+                            modalInstance.code = code;
+                        }).
+                        error(function (data, status, headers, config) {
+                            alert("AJAX failed!");
                         });
-                        modalInstance.code = code;
-                    }).
-                    error(function (data, status, headers, config) {
-                        alert("AJAX failed!");
-                    });
                     break;
 
                 case 'create':
                     $http.post('/service/add_product/', formData).
-                    success(function (data, status, headers, config) {
-                        if (data.code === 'success') {
-                            data.title          = formData.title;
-                            data.photo[0].photo = data.photo;
-                            addElements(data, 'prepend');
-                            $modalInstance.dismiss('cancel');
-                        }
-                    })
-                    .error(function (data, status, headers, config) {
-                        alert("AJAX failed!");
-                    });
+                        success(function (data, status, headers, config) {
+                            if (data.code === 'success') {
+                                data.title          = formData.title;
+                                data.photo[0].photo = data.photo;
+                                addElements(data, 'prepend');
+                                $modalInstance.dismiss('cancel');
+                            }
+                        })
+                        .error(function (data, status, headers, config) {
+                            alert("AJAX failed!");
+                        });
             }
         };
 
@@ -470,13 +470,13 @@
     }
 
     function addElements(data, typeInsert) {
-        var photo = (data.photo[0].photo == undefined) ? data.photo : data.photo[0].photo;
+        var photo = (data.photo[0] == undefined || data.photo[0].photo == undefined) ? 'nofoto.png' : data.photo[0].photo;
         var template = '<tr class="tr-' + data.product_id +' "><td class="photo">' +
             '<img src="upload/images/'+ photo +'" /></td><td class="td-title"><span class="sp-title">' + data.title + '</span></td>' +
             '<td class="control-elem">' +
-            '<button type="button" class="btn btn-info btn-sm l-rewiew" ng-click="reviewProduct('+ data.product_id +', $event)">Review</button>' +
-            '<button type="button" class="btn btn-primary btn-sm l-edit" ng-click="editProduct('+ data.product_id +', $event)">Edit</button>' +
-            '<button type="button" class="btn btn-danger  btn-sm l-remove" ng-click="removeProduct(' + data.product_id + ', $event)">Remove</button>' +
+            '<button type="button" class="btn btn-info btn-sm l-rewiew'+ data.product_id +'" ng-click="reviewProduct('+ data.product_id +', $event)">Review</button>' +
+            '<button type="button" class="btn btn-primary btn-sm l-edit'+ data.product_id +'" ng-click="editProduct('+ data.product_id +', $event)">Edit</button>' +
+            '<button type="button" class="btn btn-danger  btn-sm l-remove'+ data.product_id +'" ng-click="removeProduct(' + data.product_id + ', $event)">Remove</button>' +
             '</td></tr>';
 
         if(typeInsert === 'append') {
@@ -485,13 +485,13 @@
             el('.tb.body').prepend(template);
         }
 
-        el('.l-edit').off('click').on("click", function() {
+        el('.l-edit'+ data.product_id).on("click", function() {
             editProduct(data.product_id, {});
         });
-        el('.l-remove').off('click').on("click", function() {
+        el('.l-remove'+ data.product_id).on("click", function() {
             removeProduct(data.product_id, {});
         });
-        el('.l-rewiew').off('click').on("click", function() {
+        el('.l-rewiew'+ data.product_id).on("click", function() {
             reviewProduct(data.product_id, {});
         });
         offset.setOffest(offset.getOffest() + 1);
